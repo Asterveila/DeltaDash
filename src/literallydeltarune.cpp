@@ -134,7 +134,7 @@ CharacterAttributes getCharAttributes(int stars, int isDemon, std::string charac
         attrs.maxHealth = 90.f + attrs.bonusHealth;
     } else if (character == "player") {
         auto playerColor = gm->colorForIdx(gm->getPlayerColor());
-        attrs.tabContainerColor = playerColor
+        attrs.tabContainerColor = playerColor;
         attrs.tabElementsColor = getPastelCol(playerColor, 0.5f);
         int playerLv = Mod::get()->getSavedValue<int>("player-lv", 0);
         int bonus = 20 * playerLv;
@@ -464,7 +464,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             
             auto frame = getGamemodeFrame(m_player1);
             member->updateCharacterIcon(frame);
-            member->updatePlayerColors(m_player1->m_playerColor1, m_player1->m_playerColor1);
+            if (member->isActive()) member->updatePlayerColors(m_player1->m_playerColor1, m_player1->m_playerColor1);
         }
     }
 
@@ -1164,21 +1164,21 @@ class $modify(DeltaPlayLayer, PlayLayer) {
     
     #ifndef GEODE_IS_IOS
     void setupKeybinds() {
-        this->addEventListener<InvokeBindFilter>([=](InvokeBindEvent* event) {
+        this->addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
             if (event->isDown()) {
                 healPrayerKeybindVer();
             }
             return ListenerResult::Propagate;
         }, "heal-prayer-key"_spr);
         
-        this->addEventListener<InvokeBindFilter>([=](InvokeBindEvent* event) {
+        this->addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
             if (event->isDown()) {
                 playerDefendKeybindVer();
             }
             return ListenerResult::Propagate;
         }, "defend-key"_spr);
 
-        this->addEventListener<InvokeBindFilter>([=](InvokeBindEvent* event) {
+        this->addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
             if (event->isDown()) {
                 activateBattleModeKeybind();
             }
