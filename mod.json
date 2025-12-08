@@ -1,0 +1,107 @@
+{
+	"geode": "4.10.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"settings": {
+		"enable-deltarune": {
+			"type": "bool",
+			"name": "Enable DeltaDash",
+			"description": "Enables/Disables the mod.",
+			"default": true
+		},
+		"activation-mode": {
+			"type": "string",
+			"name": "Activation Mode",
+			"description": "Defines when to activate Battle Mode, aka, all the mod's features. \n\n- 'On Start' will activate the mod as soon as the level starts.\n- 'Mid-Game Keybind' will let you activate the mod at any time using a keybind (default: Q).",
+			"default": "on-start",
+			"one-of": ["on-start", "midgame-keybind"]
+		},
+		"party-char1": {
+			"type": "string",
+			"name": "Party - Character 1",
+			"description": "The character to use in the Deltarune styled tab. Affects max HP value. If the current level is a demon, max HP gets a +40 bonus (putting the delta warriors in their Ch4 health values).",
+			"default": "kris",
+			"one-of": ["kris", "susie", "ralsei", "noelle", "player", "true-player"]
+		},
+		"party-char2": {
+			"type": "string",
+			"name": "Party - Character 2",
+			"description": "Same as before, but defines your second party member.",
+			"default": "susie",
+			"one-of": ["kris", "susie", "ralsei", "noelle", "player", "none"]
+		},
+		"party-char3": {
+			"type": "string",
+			"name": "Party - Character 3",
+			"description": "Same as before, but defines your third party member.",
+			"default": "ralsei",
+			"one-of": ["kris", "susie", "ralsei", "noelle", "player", "none"]
+		},
+		"enable-soul": {
+			"type": "bool",
+			"name": "Soul Mode",
+			"description": "Replaces the player icon with the soul.",
+			"default": false
+		},
+		"misc-title": {
+			"type": "title",
+			"name": "Miscellaneous",
+			"description": "Misc settings for the mod."
+		},
+		"ui-scale": {
+			"type": "float",
+			"name": "UI Scale - Party UI",
+			"description": "Controls the scale of the Party Members UI elements at the bottom of the screen.",
+			"default": 1.0,
+			"min": 0.1,
+			"max": 1.0
+		},
+		"always-imitate-deltarune-pos": {
+			"type": "bool",
+			"name": "Damage/Down/Heal indicators - Always Immitate Deltarune Position",
+			"description": "Always positions the damage, downed and healing indicators to the left side of the screen, like on Deltarune's battle screen, instead of trying to fetch the Player's screen pos.",
+			"default": false
+		}
+	},
+	"resources": {
+		"files": [
+			"resources/*.ogg",
+			"resources/fonts/*.png",
+			"resources/fonts/*.fnt",
+			"resources/animated/*.gif"
+		],
+		"spritesheets": {
+			"DeltaruneSheet": [
+				"resources/deltarune/*.png"
+			]
+		},
+		"sprites": [
+			"resources/*.png"
+		]
+	},
+	"id": "saritahhh.deltadash",
+	"name": "DeltaDash",
+	"version": "v1.0.0",
+	"developer": "Saritahhh",
+	"description": "Bring Deltarune aspects to GD!",
+	"tags": ["gameplay", "interface", "cheat", "customization"],
+	"dependencies": {
+		"geode.node-ids": ">=v1.20.0",
+		"prevter.imageplus": {
+			"version": ">=v1.0.1",
+			"importance": "required"
+		},
+		"geode.custom-keybinds": {
+			"importance": "required",
+			"version": ">=1.10.0"
+		},
+		"hiimjustin000.more_icons": {
+            "version": ">=v1.16.0",
+            "importance": "required"
+        }
+	}
+}
