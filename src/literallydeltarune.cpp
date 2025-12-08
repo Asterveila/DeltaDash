@@ -16,6 +16,18 @@ bool enableDeltarune = Mod::get()->getSettingValue<bool>("enable-deltarune");
 
 bool hpCooldown = false;
 
+ccColor3B getPastelCol(const ccColor3B& color, float factor = 0.4f) {
+    factor = std::max(0.0f, std::min(1.0f, factor));
+    
+    GLubyte r = static_cast<GLubyte>(color.r + (255 - color.r) * factor);
+    GLubyte g = static_cast<GLubyte>(color.g + (255 - color.g) * factor);
+    GLubyte b = static_cast<GLubyte>(color.b + (255 - color.b) * factor);
+
+    ccColor3B pastelized = ccColor3B({r, g, b});
+    
+    return pastelized;
+}
+
 CCSpriteFrame* getGamemodeFrame(PlayerObject* player) {
     CCSpriteFrame* ret;
 
@@ -122,8 +134,8 @@ CharacterAttributes getCharAttributes(int stars, int isDemon, std::string charac
         attrs.maxHealth = 90.f + attrs.bonusHealth;
     } else if (character == "player") {
         auto playerColor = gm->colorForIdx(gm->getPlayerColor());
-        attrs.tabContainerColor = playerColor;
-        attrs.tabElementsColor = playerColor;
+        attrs.tabContainerColor = playerColor
+        attrs.tabElementsColor = getPastelCol(playerColor, 0.5f);
         int playerLv = Mod::get()->getSavedValue<int>("player-lv", 0);
         int bonus = 20 * playerLv;
         attrs.maxHealth = 50.f + bonus;
@@ -379,13 +391,10 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         if (!fields->partyMembers.empty() && fields->partyMembers[0]) {
             if (battleModeActive) fields->partyMembers[0]->setToActiveState(false);
         }
-        
-        if (fields->tpBar) {
-            fields->tpBar->reset();
-            
-            if (activationMode == "midgame-keybind" && !battleModeActive) {
-                fields->tpBar->animateExit(0.f);
-            }
+
+        if (activationMode == "midgame-keybind" && battleModeActive) {
+            if (fields->tpBar) fields->tpBar->reset();
+            deactivateBattleMode();
         }
         
         // reset other visuals
@@ -504,13 +513,6 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         }
     }
 
-    void onExit() {
-        PlayLayer::onExit();
-        
-        if (!enableDeltarune) return;
-        Mod::get()->setSavedValue("battle-mode-active", false);
-    }
-
     void activateBattleMode(float dt = 0.f) {
         auto fields = m_fields.self();
         
@@ -608,7 +610,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             checkAllDefenseComplete();
         }
         
-        targetMember->takeDamage(damageAmount);
+        if (!targetMember->isDead()) targetMember->takeDamage(damageAmount);
         
         int actualAlive = 0;
         for (auto* member : fields->partyMembers) {
@@ -663,7 +665,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             damages.push_back(damage);
             totalDamage += damage;
             
-            member->takeDamage(damage);
+            if (!member->isDead()) member->takeDamage(damage);
         }
         
         checkAllDefenseComplete();
@@ -1216,7 +1218,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
                     auto* downSprite = fields->downSprites[i];
                     downSprite->setPosition({screenPos.x, screenPos.y + yOffset});
                     downSprite->setOpacity(255);
-                    downSprite->setScale(0.6f);
+                    downSprite->setScale(1.f);
                     
                     auto animation = createDownSpriteAnimation();
                     downSprite->stopAllActions();

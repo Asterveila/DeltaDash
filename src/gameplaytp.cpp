@@ -4,6 +4,7 @@
 #include <random>
 #include "helper.hpp"
 #include "TPBar.hpp"
+#include "GrazeSprite.hpp"
 
 using namespace geode::prelude;
 
@@ -14,13 +15,6 @@ static const std::set<int> sawblades = {88, 89, 98, 183, 184, 185, 186, 187, 188
 
 bool enableDeltaruneMod = Mod::get()->getSettingValue<bool>("enable-deltarune");
 
-float getRandomFloat(float min, float max) {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(min, max);
-    return dis(gen);
-}
-
 void SarahsTweaks::cooldownTP(float dt) {
     tpCooldown = false;
 }
@@ -29,6 +23,13 @@ $on_mod(Loaded) {
     listenForSettingChanges("enable-deltarune", [](bool value) {
         enableDeltaruneMod = value;
     });
+}
+
+float getRandomFloat(float min, float max) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(min, max);
+    return dis(gen);
 }
 
 class $modify(TPBaseLayer, GJBaseGameLayer) {
@@ -50,63 +51,25 @@ class $modify(TPBaseLayer, GJBaseGameLayer) {
         float tpGain = getRandomFloat(1.f, 9.f);
         tpBar->addTP(tpGain);
         
-        showTPGrazeEffect(isPlayer2 ? m_player2 : m_player1, 0.35f);
+        showTPGrazeEffect(isPlayer2 ? m_player2 : m_player1);
     }
 
-	void showTPGrazeEffect(PlayerObject* targetPlayer, float extraScale) {
+	void showTPGrazeEffect(PlayerObject* targetPlayer) {
         if (!targetPlayer) return;
         
-        auto tpSprite = static_cast<CCSprite*>(targetPlayer->m_mainLayer->getChildByID("tp-effect-sprite"_spr));
-        auto riderTpSprite = static_cast<CCSprite*>(targetPlayer->m_mainLayer->getChildByID("rider-tp-effect-sprite"_spr));
-        
-        if (Mod::get()->getSettingValue<bool>("enable-soul")) {
-            auto soul = targetPlayer->getChildByID("soul-sprite"_spr);
-            if (soul) {
-                tpSprite = static_cast<CCSprite*>(soul->getChildByID("soul-graze-sprite"_spr));
-            }
-        }
-        
-        if (!tpSprite || !riderTpSprite) return;
-        
-        if (!Mod::get()->getSettingValue<bool>("enable-soul")) {
-            if (targetPlayer->m_isBird || targetPlayer->m_isShip) {
-                if (targetPlayer->m_vehicleGlow) {
-                    tpSprite->setDisplayFrame(targetPlayer->m_vehicleGlow->displayFrame());
-                    tpSprite->setPosition(targetPlayer->m_vehicleGlow->getPosition());
-                    tpSprite->setScale(targetPlayer->m_vehicleGlow->getScale() + extraScale);
-                }
-                if (targetPlayer->m_iconGlow) {
-                    riderTpSprite->setDisplayFrame(targetPlayer->m_iconGlow->displayFrame());
-                    riderTpSprite->setPosition(targetPlayer->m_iconGlow->getPosition());
-                    riderTpSprite->setScale(targetPlayer->m_iconGlow->getScale() + extraScale);
-                }
+        auto grazeSprite = static_cast<GrazeSprite*>(targetPlayer->getUserObject("graze-sprite-handler"_spr));
+        if (!grazeSprite) {
+            grazeSprite = GrazeSprite::create(targetPlayer);
+            if (grazeSprite) {
+                targetPlayer->setUserObject("graze-sprite-handler"_spr, grazeSprite);
+                targetPlayer->m_mainLayer->addChild(grazeSprite->getGrazeSprite(), -6);
             } else {
-                if (targetPlayer->m_iconGlow) {
-                    tpSprite->setDisplayFrame(targetPlayer->m_iconGlow->displayFrame());
-                    tpSprite->setPosition(targetPlayer->m_iconGlow->getPosition());
-                    tpSprite->setScale(targetPlayer->m_iconGlow->getScale() + extraScale);
-                }
+                log::error("Failed to create GrazeSprite");
+                return;
             }
         }
         
-        float randomDelay = getRandomFloat(0.05f, 0.1f);
-        auto fadeAnimation = CCSequence::create(
-            CCFadeIn::create(0.f),
-            CCDelayTime::create(randomDelay),
-            CCEaseOut::create(CCFadeOut::create(0.3f), 2.f),
-            nullptr
-        );
-        
-        tpSprite->stopAllActions();
-        tpSprite->runAction(fadeAnimation);
-        
-        if (targetPlayer->m_isBird || targetPlayer->m_isShip) {
-            auto riderFadeAnimation = static_cast<CCSequence*>(fadeAnimation->copy());
-            riderTpSprite->stopAllActions();
-            riderTpSprite->runAction(riderFadeAnimation);
-        } else {
-            riderTpSprite->setOpacity(0);
-        }
+        grazeSprite->showGrazeEffect(0.3f);
     }
 
     void collisionCheckObjects(PlayerObject* player, gd::vector<GameObject*>* objs, int objectCount, float dt) {
@@ -155,19 +118,12 @@ class $modify(TPPlayerObject, PlayerObject) {
         if (!PlayerObject::init(player, ship, gameLayer, layer, playLayer)) return false;
 
         if (!enableDeltaruneMod) return true;
-    
-        auto tpSprite = CCSprite::create();
-        tpSprite->setID("tp-effect-sprite"_spr);
-        tpSprite->setOpacity(0);
-        tpSprite->setZOrder(-6);
         
-        auto riderTPSprite = CCSprite::create();
-        riderTPSprite->setID("rider-tp-effect-sprite"_spr);
-        riderTPSprite->setOpacity(0);
-        riderTPSprite->setZOrder(-5);
-        
-        m_mainLayer->addChild(tpSprite);
-        m_mainLayer->addChild(riderTPSprite);
+        auto grazeSprite = GrazeSprite::create(this);
+        if (grazeSprite) {
+            this->setUserObject("graze-sprite-handler"_spr, grazeSprite);
+            m_mainLayer->addChild(grazeSprite->getGrazeSprite(), -6);
+        }
 
         tpCooldown = false;
         
