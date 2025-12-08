@@ -86,7 +86,7 @@
 	"id": "saritahhh.deltadash",
 	"name": "DeltaDash",
 	"version": "v1.0.0",
-	"developer": "Saritahhh",
+	"developers": ["Saritahhh", "Erymanthus"],
 	"description": "Bring Deltarune aspects to GD!",
 	"tags": ["gameplay", "interface", "cheat", "customization"],
 	"dependencies": {

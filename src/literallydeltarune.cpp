@@ -24,7 +24,6 @@ ccColor3B getPastelCol(const ccColor3B& color, float factor = 0.4f) {
     GLubyte b = static_cast<GLubyte>(color.b + (255 - color.b) * factor);
 
     ccColor3B pastelized = ccColor3B({r, g, b});
-    
     return pastelized;
 }
 
@@ -56,7 +55,7 @@ CharacterAttributes getCharAttributes(int stars, int isDemon, std::string charac
     if (stars == 12022004) {
         attrs.minDamage = 20.f;
         attrs.maxDamage = 40.f;
-        log::warn("we're using placeholder values!! you're either on a main level or something went pretty wrong.");
+        //log::warn("we're using placeholder values!! you're either on a main level or something went pretty wrong.");
     } else if (stars < 10) {
         switch (stars) {
             case 6:
@@ -160,8 +159,8 @@ $on_mod(Loaded){
     #ifndef GEODE_IS_IOS
     BindManager::get()->registerBindable({
         "heal-prayer-key"_spr,
-        "Heal Prayer keybind",
-        "",
+        "Heal keybind",
+        "Key to heal the active party member in-game,",
         { Keybind::create(KEY_C, Modifier::None) },
         Mod::get()->getName()
     });
@@ -169,7 +168,7 @@ $on_mod(Loaded){
     BindManager::get()->registerBindable({
         "defend-key"_spr,
         "Defend keybind",
-        "",
+        "Key to defend as the active party member in-game",
         { Keybind::create(KEY_V, Modifier::None) },
         Mod::get()->getName()
     });
@@ -247,7 +246,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         if (fields->tpBar) {
             m_uiLayer->addChild(fields->tpBar);
             fields->tpBar->setZOrder(20);
-            log::info("created TP bar");
+            //log::info("created TP bar");
         } else {
             log::error("couldn't create tp bar");
         }
@@ -283,7 +282,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             }
         }
 
-        log::info("using {} party members", partyChars.size());
+        //log::info("using {} party members", partyChars.size());
         
         // make all tabs
         for (const auto& character : partyChars) {
@@ -298,7 +297,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             fields->partyContainer->addChild(battleTab);
             
             fields->partyMembers.push_back(battleTab);
-            log::info("created tab for {}", character);
+            //log::info("created tab for {}", character);
         }
         
         fields->alivePartyMembers = fields->partyMembers.size();
@@ -483,11 +482,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         }
         
         int aliveBefore = 0;
-        for (auto* member : fields->partyMembers) {
-            if (member && !member->isDead()) {
-                aliveBefore++;
-            }
-        }
+        for (auto* member : fields->partyMembers) if (member && !member->isDead()) aliveBefore++;
         
         if (aliveBefore <= 0) {
             return PlayLayer::destroyPlayer(player, obj);
@@ -523,11 +518,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         
         FMODAudioEngine::sharedEngine()->playEffect("snd_weaponpull_fast.ogg"_spr);
         
-        for (auto* member : fields->partyMembers) {
-            if (member) {
-                member->setToInactiveState(true);
-            }
-        }
+        for (auto* member : fields->partyMembers) if (member) member->setToInactiveState(true);
         
         if (fields->tpBar) {
             if (dt > 0.f) fields->tpBar->reset();
@@ -1282,10 +1273,9 @@ class $modify(DeltaPlayLayer, PlayLayer) {
     CCPoint getPlayerScreenPosition(PlayerObject* player) {
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         
-        if (Mod::get()->getSettingValue<bool>("always-imitate-deltarune-pos")) return {winSize.width / 2.f - 60.f, winSize.height / 2.f};
+        if (Mod::get()->getSettingValue<bool>("always-imitate-deltarune-pos")) return {winSize.width / 2.f - winSize.width / 4.f, winSize.height / 2.f};
         
-        auto mainNode = this->getChildByID("main-node");
-        if (!mainNode || !m_objectLayer) return {winSize.width / 2.f - 60.f, winSize.height / 2.f};
+        if (!m_objectParent || !m_objectLayer) return {winSize.width / 2.f - winSize.width / 4.f, winSize.height / 2.f};
         
         auto playerWorldPos = player->getPosition();
         auto worldPos = m_objectLayer->convertToWorldSpace(playerWorldPos);
@@ -1294,7 +1284,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
     
     CCAction* createFloatingTextAnimation() {
         auto downAnim = CCSequence::create(
-            CCEaseOut::create(CCMoveBy::create(0.15f, {9.f, 20.f}), 2.f),
+            CCEaseOut::create(CCMoveBy::create(0.15f, {10.f, 22.5f}), 2.f),
             CCEaseBounceOut::create(CCMoveBy::create(0.4f, {0.f, -18.f})),
             CCDelayTime::create(0.25f),
             CCMoveBy::create(0.3f, {0.f, 50.f}),
