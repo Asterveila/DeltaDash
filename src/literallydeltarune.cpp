@@ -281,8 +281,6 @@ class $modify(DeltaPlayLayer, PlayLayer) {
                 partyChars.push_back(partyMember3);
             }
         }
-
-        //log::info("using {} party members", partyChars.size());
         
         // make all tabs
         for (const auto& character : partyChars) {
@@ -900,6 +898,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
 
     void playerDefend(CCObject* sender) {
         auto fields = m_fields.self();
+        bool battleModeActive = Mod::get()->getSavedValue<bool>("battle-mode-active", false);
         
         if (fields->activePartyMemberIndex >= fields->partyMembers.size()) return;
         
@@ -907,7 +906,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         if (!activeMember) return;
         
         if (!activeMember->isActive() || !activeMember->getButtonMenu() || 
-            !activeMember->getButtonMenu()->isEnabled()) {
+            !activeMember->getButtonMenu()->isEnabled() || !battleModeActive) {
             FMODAudioEngine::sharedEngine()->playEffect("snd_cantselect_1.ogg"_spr);
             return;
         }
@@ -927,6 +926,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
 
     void playerDefendKeybindVer() {
         auto fields = m_fields.self();
+        bool battleModeActive = Mod::get()->getSavedValue<bool>("battle-mode-active", false);
         
         if (fields->activePartyMemberIndex >= fields->partyMembers.size()) return;
         
@@ -934,7 +934,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         if (!activeMember) return;
         
         auto menu = activeMember->getButtonMenu();
-        if (!activeMember->isActive() || !menu || !menu->isEnabled()) {
+        if (!activeMember->isActive() || !menu || !menu->isEnabled() || !battleModeActive) {
             FMODAudioEngine::sharedEngine()->playEffect("snd_cantselect_1.ogg"_spr);
             return;
         }
@@ -968,6 +968,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
 
     void healPrayer(CCObject* sender) {
         auto fields = m_fields.self();
+        bool battleModeActive = Mod::get()->getSavedValue<bool>("battle-mode-active", false);
         
         if (fields->activePartyMemberIndex >= fields->partyMembers.size()) return;
         
@@ -977,7 +978,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         if (!fields->tpBar) return;
         
         if (!activeMember->isActive() || !activeMember->getButtonMenu() || 
-            !activeMember->getButtonMenu()->isEnabled()) {
+            !activeMember->getButtonMenu()->isEnabled() || !battleModeActive) {
             FMODAudioEngine::sharedEngine()->playEffect("snd_cantselect_1.ogg"_spr);
             return;
         }
@@ -1002,6 +1003,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
 
     void healPrayerKeybindVer() {
         auto fields = m_fields.self();
+        bool battleModeActive = Mod::get()->getSavedValue<bool>("battle-mode-active", false);
         
         if (fields->activePartyMemberIndex >= fields->partyMembers.size()) return;
         
@@ -1011,7 +1013,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         auto menu = activeMember->getButtonMenu();
         if (!menu) return;
         
-        if (!activeMember->isActive() || !menu || !menu->isEnabled()) {
+        if (!activeMember->isActive() || !menu || !menu->isEnabled() || !battleModeActive) {
             FMODAudioEngine::sharedEngine()->playEffect("snd_cantselect_1.ogg"_spr);
             return;
         }

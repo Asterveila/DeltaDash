@@ -241,7 +241,7 @@ void BattleTab::updateHPLabel() {
 }
 
 void BattleTab::showHurtIcon(float duration) {
-    if (!m_hurtIcon) return;
+    if (!m_hurtIcon || m_isDefending) return;
     
     m_charIcon->setVisible(false);
     m_hurtIcon->setVisible(true);
