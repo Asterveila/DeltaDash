@@ -18,6 +18,7 @@ Bring Deltarune's Battle System to Geometry Dash!
 - <cs>**Leveling Up System**</c>: One of the available party members you can choose from is you, the "Player" character! This character starts out weak, but gains +20HP every 100 starts you obtain! Beat levels to **Get Stronger.**
 - <cs>**TP Gaining System**</c>: Get close to hazards without fully touching them to GRAZE and build up TP, like in Deltarune! TP can then be used to <cg>HEAL</c>!
 - <cs>**Faithful Deltarune UI & Visuals**</c>: The mod faithfully recreates the Battle UI from Deltarune, as well as the Grazing visual effect you see in the game! You will also see Label Indicators on screen when taking damage & healing, showing you how many DAMAGE you took, if any party member was DOWNED, or how much HP you <cg>HEALed</c>!
+- <cs>**Soul Mode**</c>: Replace the Player Icon with the Soul Sprite from Deltarune! Includes some visual customization options, like color modes, rotation settings, and more!
 
 # Customization
 The mod allows you to customize some aspects of it too, via the mod's settings page!

@@ -119,6 +119,9 @@
 	"developers": ["Saritahhh", "Erymanthus"],
 	"description": "Bring Deltarune aspects to GD!",
 	"tags": ["gameplay", "interface", "cheat", "customization"],
+	"links": {
+		"source": "https://github.com/Asterveila/DeltaDash"
+	},
 	"dependencies": {
 		"geode.node-ids": ">=v1.20.0",
 		"prevter.imageplus": {
