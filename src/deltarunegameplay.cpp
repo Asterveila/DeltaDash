@@ -594,7 +594,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         bool wasDefending = targetMember->isDefending();
         
         if (targetMember->isDefending()) {
-            damageAmount *= 0.4f;
+            damageAmount *= 0.5f;
             bool stillDefending = targetMember->processDefendedHit();
             checkAllDefenseComplete();
         }
