@@ -1,4 +1,5 @@
-<img src="logo.png" width="150" alt="DELTADASH Mod Header"/><img src="resources/deltadash_header.png" width="150" alt="DELTADASH Mod Header"/>
+<img src="logo.png" height="150" alt="DELTADASH Mod Header"/><img src="resources/deltadash_header.png" height="150" alt="DELTADASH Mod Header"/>
+
 Bring Deltarune's Battle System to Geometry Dash!
 
 # Overview
