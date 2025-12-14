@@ -1,4 +1,5 @@
 #include <Geode/modify/PlayerObject.hpp>
+#include "classes/GrazeSprite.hpp"
 
 using namespace geode::prelude;
 
@@ -23,22 +24,18 @@ class $modify(StupidPlayerObject, PlayerObject) {
         m_robotSprite->setVisible(false);
         m_spiderSprite->setVisible(false);
 
-        if (Mod::get()->getSettingValue<bool>("enable-soul")) {
-            fields->p_grazeSpr = CCSprite::createWithSpriteFrameName("soulGraze.png"_spr);
-            fields->p_grazeSpr->setID("soul-graze-sprite"_spr);
-            fields->p_grazeSpr->setOpacity(0);
-
-            fields->p_soulSpr->addChild(fields->p_grazeSpr);
-
-            fields->p_grazeSpr->setPosition({fields->p_soulSpr->getContentSize().width / 2.f, fields->p_soulSpr->getContentSize().height / 2.f});
-        }
-
         return true;
     }
 
     ccColor3B getColorToUse() {
         ccColor3B ret;
         std::string colorMode = Mod::get()->getSettingValue<std::string>("soulmode-colormode");
+        auto gm = GameManager::sharedState();
+
+        if (Mod::get()->getSettingValue<bool>("soulmode-static-color")) {
+            ret = gm->colorForIdx(gm->getPlayerColor());
+            return ret;
+        }
 
         if (colorMode == "GD Color") {
             if (m_isShip) {
@@ -87,7 +84,6 @@ class $modify(StupidPlayerObject, PlayerObject) {
         if (!Mod::get()->getSettingValue<bool>("enable-soul")) return;
         auto fields = m_fields.self();
         auto mod = Mod::get();
-        auto gm = GameManager::sharedState();
         if (!fields->p_soulSpr) return;
 
         float targetScale;
@@ -102,22 +98,35 @@ class $modify(StupidPlayerObject, PlayerObject) {
 
         this->setRotation(0);
         fields->p_soulSpr->setScale(targetScale);
-
-        if (!mod->getSettingValue<bool>("soulmode-static-color")) {
-            fields->p_soulSpr->setColor(getColorToUse());
-        } else {
-            fields->p_soulSpr->setColor(gm->colorForIdx(gm->getPlayerColor()));
-        }
+        fields->p_soulSpr->setColor(getColorToUse());
         
         if (!mod->getSettingValue<bool>("soulmode-keepat0rot")) {
-            fields->p_soulSpr->setFlipY(m_isUpsideDown);
             if (m_isSwing) {
-                fields->p_soulSpr->setRotation(90);
+                fields->p_soulSpr->setRotation(-90);
             } else {
                 fields->p_soulSpr->setRotation(0);
+                fields->p_soulSpr->setFlipY(m_isUpsideDown);
             }
         }
 
         if (m_ghostTrail) m_ghostTrail->m_iconSprite = fields->p_soulSpr;
+        
+        auto grazeSprite = static_cast<GrazeSprite*>(this->getUserObject("graze-sprite-handler"_spr));
+        if (grazeSprite && grazeSprite->getGrazeSprite()) {
+            auto grazeVisual = grazeSprite->getGrazeSprite();
+            
+            if (!mod->getSettingValue<bool>("soulmode-keepat0rot")) {
+                if (m_isSwing) {
+                    grazeVisual->setRotation(-90);
+                } else {
+                    grazeVisual->setRotation(0);
+                    grazeVisual->setFlipY(m_isUpsideDown);
+                }
+            } else {
+                grazeVisual->setRotation(0);
+                grazeVisual->setFlipY(false);
+            }
+            grazeVisual->setScale(targetScale);
+        }
     }
 };

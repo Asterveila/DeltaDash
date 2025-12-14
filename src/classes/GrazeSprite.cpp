@@ -22,15 +22,18 @@ bool GrazeSprite::init(PlayerObject* player) {
     if (!CCNode::init()) return false;
     
     m_targetPlayer = player;
+    m_soulModeEnabled = Mod::get()->getSettingValue<bool>("enable-soul");
     
-    setupSimplePlayers();
-    
-    m_renderTexture = CCRenderTexture::create(static_cast<int>(m_containerSize), static_cast<int>(m_containerSize), kCCTexture2DPixelFormat_RGBA8888);
-    if (!m_renderTexture) {
-        log::error("Failed to create render texture for graze sprite");
-        return false;
+    if (!m_soulModeEnabled) {
+        setupSimplePlayers();
+        
+        m_renderTexture = CCRenderTexture::create(static_cast<int>(m_containerSize), static_cast<int>(m_containerSize), kCCTexture2DPixelFormat_RGBA8888);
+        if (!m_renderTexture) {
+            log::error("Failed to create render texture for graze sprite");
+            return false;
+        }
+        m_renderTexture->retain();
     }
-    m_renderTexture->retain();
     
     m_grazeSprite = CCSprite::create();
     m_grazeSprite->setOpacity(0);
@@ -228,7 +231,21 @@ void GrazeSprite::updateSimplePlayersForGamemode(IconType iconType) {
 }
 
 void GrazeSprite::renderGrazeSprite() {
-    if (!m_renderTexture || !m_targetPlayer) return;
+    if (!m_targetPlayer) return;
+    
+    if (m_soulModeEnabled) {
+        auto soulGrazeFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("soulGraze.png"_spr);
+        //auto soulGrazeFrame = CCSprite::createWithSpriteFrameName("soulGraze.png"_spr)->displayFrame();
+        if (soulGrazeFrame) {
+            m_grazeSprite->setDisplayFrame(soulGrazeFrame);
+            m_grazeSprite->setScale(1.0f);
+        } else {
+            log::error("failed to load soul graze spr");
+        }
+        return;
+    }
+    
+    if (!m_renderTexture) return;
     
     IconType currentMode = IconType::Cube;
     if (m_targetPlayer->m_isShip) currentMode = IconType::Ship;
@@ -302,7 +319,9 @@ void GrazeSprite::renderGrazeSprite() {
         m_grazeSprite->setBlendFunc({GL_SRC_ALPHA, GL_ONE});
         
         m_grazeSprite->setFlipY(true);
-        m_grazeSprite->setScale(1.5f);
+        
+        float grazeScale = Mod::get()->getSettingValue<double>("graze-scale");
+        m_grazeSprite->setScale(grazeScale);
     }
     
     iconContainer->removeAllChildren();

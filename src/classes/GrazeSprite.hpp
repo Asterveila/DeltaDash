@@ -15,6 +15,7 @@ protected:
     
     PlayerObject* m_targetPlayer = nullptr;
     bool m_initialized = false;
+    bool m_soulModeEnabled = false;
 
     float m_containerSize = 80.f;
     

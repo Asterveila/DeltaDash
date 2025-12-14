@@ -58,11 +58,17 @@ class $modify(TPBaseLayer, GJBaseGameLayer) {
         if (!targetPlayer) return;
         
         auto grazeSprite = static_cast<GrazeSprite*>(targetPlayer->getUserObject("graze-sprite-handler"_spr));
+        bool soulMode = Mod::get()->getSettingValue<bool>("enable-soul");
         if (!grazeSprite) {
             grazeSprite = GrazeSprite::create(targetPlayer);
             if (grazeSprite) {
                 targetPlayer->setUserObject("graze-sprite-handler"_spr, grazeSprite);
-                targetPlayer->m_mainLayer->addChild(grazeSprite->getGrazeSprite(), -6);
+                if (!soulMode) {
+                    targetPlayer->m_mainLayer->addChild(grazeSprite->getGrazeSprite(), -6);
+                } else {
+                    targetPlayer->addChild(grazeSprite->getGrazeSprite());
+                }
+                
             } else {
                 log::error("Failed to create GrazeSprite");
                 return;
@@ -118,11 +124,17 @@ class $modify(TPPlayerObject, PlayerObject) {
         if (!PlayerObject::init(player, ship, gameLayer, layer, playLayer)) return false;
 
         if (!enableDeltaruneMod) return true;
+        bool soulMode = Mod::get()->getSettingValue<bool>("enable-soul");
         
         auto grazeSprite = GrazeSprite::create(this);
         if (grazeSprite) {
             this->setUserObject("graze-sprite-handler"_spr, grazeSprite);
-            m_mainLayer->addChild(grazeSprite->getGrazeSprite(), -6);
+            if (!soulMode) {
+                m_mainLayer->addChild(grazeSprite->getGrazeSprite(), -6);
+            } else {
+                this->addChild(grazeSprite->getGrazeSprite());
+            }
+            
         }
 
         tpCooldown = false;
