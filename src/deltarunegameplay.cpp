@@ -4,8 +4,8 @@
 #include <Geode/modify/GJGarageLayer.hpp>
 #include <geode.custom-keybinds/include/Keybinds.hpp>
 #include <random>
-#include "BattleTab.hpp"
-#include "TPBar.hpp"
+#include "classes/BattleTab.hpp"
+#include "classes/TPBar.hpp"
 
 using namespace geode::prelude;
 #ifndef GEODE_IS_IOS
@@ -1104,6 +1104,8 @@ class $modify(DeltaPlayLayer, PlayLayer) {
         
         fields->downSpr->setZOrder(1000);
         fields->healSpr->setZOrder(1000);
+        fields->damageLabel->setZOrder(1000);
+        fields->healingLabel->setZOrder(1000);
         
         fields->downSpr->setID("down-sprite"_spr);
         fields->healSpr->setID("heal-sprite"_spr);
@@ -1119,6 +1121,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             auto damageLabel = CCLabelBMFont::create("0", "damageFont.fnt"_spr);
             damageLabel->setOpacity(0);
             damageLabel->setID(fmt::format("damage-label-{}", i).c_str());
+            damageLabel->setZOrder(1000);
             this->addChild(damageLabel);
             fields->damageLabels.push_back(damageLabel);
             
@@ -1145,13 +1148,9 @@ class $modify(DeltaPlayLayer, PlayLayer) {
             auto healBtn = static_cast<CCMenuItemSpriteExtra*>(menu->getChildByID("heal-btn"_spr));
             auto defendBtn = static_cast<CCMenuItemSpriteExtra*>(menu->getChildByID("defend-btn"_spr));
             
-            if (healBtn) {
-                healBtn->setTarget(this, menu_selector(DeltaPlayLayer::healPrayer));
-            }
+            if (healBtn) healBtn->setTarget(this, menu_selector(DeltaPlayLayer::healPrayer));
             
-            if (defendBtn) {
-                defendBtn->setTarget(this, menu_selector(DeltaPlayLayer::playerDefend));
-            }
+            if (defendBtn) defendBtn->setTarget(this, menu_selector(DeltaPlayLayer::playerDefend));
         }
     }
     
@@ -1315,7 +1314,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
     
     CCAction* createDownSpriteAnimation() {
         auto moveAnim = CCSequence::create(
-            CCEaseOut::create(CCMoveBy::create(0.15f, {9.f, 20.f}), 2.f),
+            CCEaseOut::create(CCMoveBy::create(0.15f, {10.f, 22.5f}), 2.f),
             CCEaseBounceOut::create(CCMoveBy::create(0.4f, {0.f, -18.f})),
             CCDelayTime::create(0.25f),
             CCMoveBy::create(0.3f, {0.f, 50.f}),
@@ -1343,7 +1342,7 @@ class $modify(DeltaPlayLayer, PlayLayer) {
     
     CCAction* createHealSpriteAnimation(float extraDelay = 0.f) {
         auto moveAnim = CCSequence::create(
-            CCEaseOut::create(CCMoveBy::create(0.15f, {0.f, 20.f}), 2.f),
+            CCEaseOut::create(CCMoveBy::create(0.15f, {10.f, 22.5f}), 2.f),
             CCEaseBounceOut::create(CCMoveBy::create(0.4f, {0.f, -18.f})),
             CCDelayTime::create(0.25f + extraDelay),
             CCMoveBy::create(0.3f, {0.f, 50.f}),

@@ -3,8 +3,8 @@
 #include <Geode/modify/PlayerObject.hpp>
 #include <random>
 #include "helper.hpp"
-#include "TPBar.hpp"
-#include "GrazeSprite.hpp"
+#include "classes/TPBar.hpp"
+#include "classes/GrazeSprite.hpp"
 
 using namespace geode::prelude;
 
