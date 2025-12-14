@@ -64,4 +64,4 @@ Defending reduces all damage taken by the Defending party member by half! AKA, y
 
 # Credits
 - **Toby Fox**: Creator of Undertale & Deltarune.
-- [**Erymanthus**](user:1941705): Code from their Jesus mod was used as a base for the Grazing/TP Gaining logic.
+- [**Erymanthus**](https://github.com/RayDeeUx): Code from their Jesus mod was used as a base for the Grazing/TP Gaining logic.
